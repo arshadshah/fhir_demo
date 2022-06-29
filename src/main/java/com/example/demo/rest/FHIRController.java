@@ -5,6 +5,7 @@ import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.parser.IParser;
 import com.example.demo.dto.PatientDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,12 +34,13 @@ public class FHIRController {
     }
 
     @PostMapping(path = "fhir/",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public PatientDto convertFhirToDto(@RequestBody String patientstr) throws JsonProcessingException {
+    public PatientDto convertFhirToDto(@RequestBody JsonNode patientstr) throws JsonProcessingException {
         FhirContext ctx = FhirContext.forDstu2();
         IParser parser = ctx.newJsonParser();
         parser.setPrettyPrint(true);
-        Patient patient = parser.parseResource(Patient.class,patientstr);
-        System.out.println("patient ->" +patient.toString());
+        System.out.println("patient ->" +patientstr.toString());
+        Patient patient = ctx.newJsonParser().parseResource(Patient.class, patientstr.toPrettyString());
+        System.out.println("patient ->" +patient.getName());
         return objectMapper.readValue(parser.encodeResourceToString(patient),PatientDto.class);
     }
 
