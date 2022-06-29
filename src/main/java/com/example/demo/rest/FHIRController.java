@@ -1,11 +1,12 @@
 package com.example.demo.rest;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.parser.IParser;
 import com.example.demo.dto.PatientDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hl7.fhir.r4.model.Patient;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,13 +24,22 @@ public class FHIRController {
     }
 
     @PostMapping
-    public PatientDto convertDto(@RequestBody PatientDto patient) throws JsonProcessingException {
-        FhirContext ctx = FhirContext.forR4();
+    public Patient convertDtoToFhir(@RequestBody PatientDto patient) throws JsonProcessingException {
+        FhirContext ctx = FhirContext.forDstu2();
         IParser parser = ctx.newJsonParser();
         Patient pt= parser.parseResource(Patient.class, objectMapper.writeValueAsString(patient));
         parser.setPrettyPrint(true);
-        System.out.println("data"+parser.encodeResourceToString(pt));
-        return objectMapper.readValue(parser.encodeResourceToString(pt),PatientDto.class);
+        return pt;
+    }
+
+    @PostMapping(path = "fhir/",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public PatientDto convertFhirToDto(@RequestBody String patientstr) throws JsonProcessingException {
+        FhirContext ctx = FhirContext.forDstu2();
+        IParser parser = ctx.newJsonParser();
+        parser.setPrettyPrint(true);
+        Patient patient = parser.parseResource(Patient.class,patientstr);
+        System.out.println("patient ->" +patient.toString());
+        return objectMapper.readValue(parser.encodeResourceToString(patient),PatientDto.class);
     }
 
 

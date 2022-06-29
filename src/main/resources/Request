@@ -1,0 +1,10 @@
+curl --location --request POST 'http://localhost:8080/api/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "resourceType": "Patient",
+    "name": [
+        {
+            "family": ["something"]
+        }
+    ]
+}'

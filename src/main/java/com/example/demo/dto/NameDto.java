@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class NameDto {
 
-    private String family;
+    private String[] family;
 }
