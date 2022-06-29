@@ -3,6 +3,7 @@ package com.example.demo.rest;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.parser.IParser;
+import ca.uhn.fhir.parser.JsonParser;
 import com.example.demo.dto.PatientDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,12 +26,11 @@ public class FHIRController {
     }
 
     @PostMapping
-    public Patient convertDtoToFhir(@RequestBody PatientDto patient) throws JsonProcessingException {
+    public JsonNode convertDtoToFhir(@RequestBody PatientDto patient) throws JsonProcessingException {
         FhirContext ctx = FhirContext.forDstu2();
-        IParser parser = ctx.newJsonParser();
-        Patient pt= parser.parseResource(Patient.class, objectMapper.writeValueAsString(patient));
-        parser.setPrettyPrint(true);
-        return pt;
+        IParser parser = ctx.newJsonParser().setPrettyPrint(true).setSuppressNarratives(true);
+        Patient pt = parser.parseResource(Patient.class, objectMapper.writeValueAsString(patient));
+        return objectMapper.readValue(parser.encodeResourceToString(pt),JsonNode.class);
     }
 
     @PostMapping(path = "fhir/",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
