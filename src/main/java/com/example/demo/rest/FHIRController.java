@@ -39,7 +39,7 @@ public class FHIRController {
         IParser parser = ctx.newJsonParser();
         parser.setPrettyPrint(true);
         System.out.println("patient ->" +patientstr.toString());
-        Patient patient = ctx.newJsonParser().parseResource(Patient.class, patientstr.toPrettyString());
+        Patient patient = parser.parseResource(Patient.class, patientstr.toPrettyString());
         System.out.println("patient ->" +patient.getName());
         return objectMapper.readValue(parser.encodeResourceToString(patient),PatientDto.class);
     }
